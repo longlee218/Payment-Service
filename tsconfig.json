@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "es2016",
+		"esModuleInterop": true,
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"sourceMap": true,
+		"noImplicitAny": true,
+		"outDir": "./build",
+		"baseUrl": ".",
+		"resolveJsonModule": true
+	},
+	"include": ["src/**/*", "__tests__/**/*"],
+	"exclude": ["node_modules", "build"]
+}
