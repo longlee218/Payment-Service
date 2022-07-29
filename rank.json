@@ -1,0 +1,40 @@
+{
+	"sochudao": [
+		{
+			"md_feature": 1,
+			"md_quote": 0,
+			"md_strengths": 0,
+			"md_weaknesses": 0,
+			"md_devDirection": 0,
+			"md_overcome": 0,
+			"md_job": 0,
+			"md_advice": 0,
+			"md_summary": 0,
+			"shortDescription": 1
+		},
+		{
+			"md_feature": 1,
+			"md_quote": 1,
+			"md_strengths": 1,
+			"md_weaknesses": 1,
+			"md_devDirection": 1,
+			"md_overcome": 0,
+			"md_job": 0,
+			"md_advice": 0,
+			"md_summary": 0,
+			"shortDescription": 1
+		},
+		{
+			"md_feature": 1,
+			"md_quote": 1,
+			"md_strengths": 1,
+			"md_weaknesses": 1,
+			"md_devDirection": 1,
+			"md_overcome": 1,
+			"md_job": 1,
+			"md_advice": 1,
+			"md_summary": 1,
+			"shortDescription": 1
+		}
+	]
+}
