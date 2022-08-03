@@ -3,8 +3,8 @@ export const MSG_NOT_SUPPORT_PAYMENT_METHOD =
 	'Hệ thống chưa hỗ trợ phương thức thanh toán này.';
 export const MSG_UNAUTHORIZED = 'Unauthorized.';
 export const MSG_NOT_FOUND = 'Không tìm thấy';
-export const MSG_FORBIDDEN = 'Forbidden.';
-export const MSG_SERVER_ERROR = 'Interal Server Error.';
+export const MSG_FORBIDDEN = 'Không đủ quyền thực hiện.';
+export const MSG_SERVER_ERROR = 'Server đã xảy ra lỗi, vui lòng thử lại sau.';
 export const MSG_ALREADY_EXISTS_FIELD = 'Đã tồn trường: ';
 export const MSG_HEADER_REQUIRED = 'Required header: ';
 export const MSG_INVALID_TOKEN = 'Token không hợp lệ';
@@ -18,3 +18,5 @@ export const MSG_PARAM_REQUIRED = 'không được bỏ trống.';
 
 export const MSG_REDIRECT = 'Đang điều hướng...';
 export const TITLE_ERROR = 'Đã có lỗi xảy ra';
+
+export const MSG_SALE_ARE_SOLVING = 'Đơn hàng đang chờ người dùng thanh toán.';

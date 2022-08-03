@@ -10,6 +10,7 @@ export class ContractService {
 			requestId: string;
 			saleId: Types.ObjectId;
 			clientId: Types.ObjectId;
+			signature1st: string;
 			signature2nd: string;
 			transType: 'momo' | 'zalopay';
 			ipnUrl: string;
@@ -25,6 +26,7 @@ export class ContractService {
 			transType: payload.transType,
 			isSuccess: false,
 			message: 'Đang gửi tới ' + payload.transType,
+			signature1st: payload.signature1st,
 			signature2nd: payload.signature2nd,
 			ipnUrl: payload.ipnUrl,
 			redirectUrl: payload.redirectUrl,
@@ -48,7 +50,7 @@ export class ContractService {
 			responseTime,
 		});
 		if (isSuccess) {
-			const saleUpdated = await Sale.findByIdAndUpdate(
+			return await Sale.findByIdAndUpdate(
 				contract.sale,
 				{
 					paymentType: payType,
@@ -61,8 +63,9 @@ export class ContractService {
 					new: true,
 				}
 			);
-			return saleUpdated;
 		}
+		await contract.deleteOne();
+		await Sale.findByIdAndDelete(contract.sale);
 		return null;
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"name": "nhansohoc-server",
+	"name": "payment_service-server",
 	"version": "1.0.0",
 	"description": "This is app from LongLe",
 	"main": "src/app.js",

@@ -42,14 +42,16 @@ const onListenning = () => {
 	Logger.info('express listening on ' + bind);
 };
 
+const domainSSLPath = path.join(__dirname, '../.cert');
+// const domainSSLPath = path.join(__dirname, '../.cert', 'fin.akb.vn_cloud');
+const httpsOptions: ServerOptions = {
+	key: fs.readFileSync(domainSSLPath + '/key.pem'),
+	cert: fs.readFileSync(domainSSLPath + '/cert.pem'),
+};
+
 /**
  * Server Activation
  */
-const httpsOptions: ServerOptions = {
-	key: fs.readFileSync(path.join(__dirname, '../.cert/key.pem')),
-	cert: fs.readFileSync(path.join(__dirname, '../.cert/cert.pem')),
-};
-
 const httpsServer = https.createServer(httpsOptions, app);
 httpsServer.listen(port);
 httpsServer.on('listening', onListenning);

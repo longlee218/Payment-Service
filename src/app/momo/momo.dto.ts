@@ -13,6 +13,7 @@ class MomoDTO {
 			storeId: Joi.string(),
 			tax: Joi.number(),
 			saleAmmmount: Joi.number().default(1),
+			signature1st: Joi.string().required(),
 			saleAmmountPaid: Joi.number().default(1),
 			price: Joi.number().required(),
 			orderInfo: Joi.string().required(),
@@ -110,8 +111,8 @@ class MomoDTO {
 				}),
 			message: Joi.string().required(),
 			payType: Joi.string()
-				.required()
-				.valid('webApp', 'app', 'qr', 'miniapp')
+				.allow('', null)
+				.valid('webApp', 'app', 'qr', 'miniapp', '')
 				.messages({
 					'any.only': `"payType" ${MSG_PARAM_INVALID}`,
 				}),

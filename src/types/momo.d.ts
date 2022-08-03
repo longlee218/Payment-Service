@@ -33,4 +33,17 @@ declare namespace MoMo {
 		totalPrice: number;
 		taxAmount?: number;
 	}
+
+	export interface IParamsMomoReturnToApp {
+		orderId: string | number;
+		price: string;
+		solved: 0 | 1;
+		resolved: 0 | 1;
+		signature1st: string;
+		signature2nd?: string;
+		timeResponse: number;
+		typePaid?: string;
+		saleId: string;
+		message: string;
+	}
 }

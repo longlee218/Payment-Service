@@ -72,6 +72,7 @@ const ContractSchema = new Schema(
 ContractSchema.plugin(mongooseDelete, {
 	deletedBy: true,
 	deletedByType: String,
+	overrideMethods: true,
 });
 
 ContractSchema.plugin(mongoosePaginate);

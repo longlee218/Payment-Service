@@ -85,7 +85,11 @@ const SaleSchema = new Schema(
 		timestamps: true,
 	}
 );
-SaleSchema.plugin(mongooseDelete, { deletedBy: true, deletedByType: String });
+SaleSchema.plugin(mongooseDelete, {
+	deletedBy: true,
+	deletedByType: String,
+	overrideMethods: true,
+});
 SaleSchema.plugin(mongoosePaginate);
 
 SaleSchema.post('save', mongoErrorE11000);

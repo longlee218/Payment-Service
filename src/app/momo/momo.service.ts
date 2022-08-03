@@ -8,11 +8,7 @@ import {
 	MOMO_PUBLIC_KEY,
 	MOMO_SECRET_KEY,
 } from '../../config/key';
-import {
-	HOOK_MOMO,
-	MOMO_PAYMENT_IPN,
-	MOMO_PAYMENT_REDIRECT,
-} from '../../config/route';
+import { MOMO_PAYMENT_IPN, MOMO_PAYMENT_REDIRECT } from '../../config/route';
 import { encrypted_Base64, encrypted_Hmac_SHA256 } from '../../helpers/encode';
 import {
 	httpsOptionsCheckStatusTrans,
@@ -34,8 +30,8 @@ export class MomoService {
 	}
 
 	private _makeIPNAndRedirectUrl(fullHost: string) {
-		// const ipnUrl = fullHost + API_V1 + MOMO_PAYMENT_IPN;
-		const ipnUrl = HOOK_MOMO;
+		const ipnUrl = fullHost + API_V1 + MOMO_PAYMENT_IPN;
+		// const ipnUrl = HOOK_MOMO;
 		const redirectUrl = fullHost + MOMO_PAYMENT_REDIRECT;
 		return { ipnUrl, redirectUrl };
 	}
@@ -55,6 +51,7 @@ export class MomoService {
 			userInfo?: object;
 			ipnUrlClient: string;
 			redirectUrlClient: string;
+			signature1st: string;
 		},
 		callback: Function
 	) {
@@ -83,6 +80,7 @@ export class MomoService {
 					saleId: saleId,
 					clientId: clientAKB._id,
 					transType: 'momo',
+					signature1st: payload.signature1st,
 					signature2nd: signature,
 					ipnUrl: payload.ipnUrlClient, // IPN của các ứng dụng
 					redirectUrl: payload.redirectUrlClient, // Redirect của các ứng dụng
