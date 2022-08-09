@@ -1,3 +1,5 @@
+import { EnumStatus } from '../config/enum';
+
 declare namespace MoMo {
 	export interface IRequestPaymentType {
 		partnerCode: string;
@@ -37,13 +39,12 @@ declare namespace MoMo {
 	export interface IParamsMomoReturnToApp {
 		orderId: string | number;
 		price: string;
-		solved: 0 | 1;
-		resolved: 0 | 1;
-		signature1st: string;
+		statusCode: EnumStatus;
+		signature1st?: string;
 		signature2nd?: string;
 		timeResponse: number;
 		typePaid?: string;
-		saleId: string;
+		saleId?: string;
 		message: string;
 	}
 }

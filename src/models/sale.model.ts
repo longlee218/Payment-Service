@@ -1,5 +1,8 @@
 import { Model, PaginateModel, Schema, Types, model } from 'mongoose';
-import mongooseDelete, { SoftDeleteDocument } from 'mongoose-delete';
+import mongooseDelete, {
+	SoftDeleteDocument,
+	SoftDeleteModel,
+} from 'mongoose-delete';
 
 import Client from './client.model';
 import { mongoErrorE11000 } from '../utils/MongoError';
@@ -86,7 +89,7 @@ const SaleSchema = new Schema(
 	}
 );
 SaleSchema.plugin(mongooseDelete, {
-	deletedBy: true,
+	deletedAt: true,
 	deletedByType: String,
 	overrideMethods: true,
 });
@@ -120,7 +123,9 @@ SaleSchema.set('toJSON', {
 
 export interface ISale extends ISaleDocument {}
 
-export interface ISaleModel extends PaginateModel<ISale> {}
+export interface ISaleModel
+	extends SoftDeleteModel<ISale>,
+		PaginateModel<ISale> {}
 
 const Sale = model<ISale, ISaleModel>('sales', SaleSchema);
 export default Sale;

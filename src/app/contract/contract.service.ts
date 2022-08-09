@@ -64,8 +64,8 @@ export class ContractService {
 				}
 			);
 		}
-		await contract.deleteOne();
-		await Sale.findByIdAndDelete(contract.sale);
+		await Contract.deleteById(contract._id);
+		await Sale.deleteById(contract.sale);
 		return null;
 	}
 }

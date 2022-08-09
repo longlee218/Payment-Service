@@ -1,5 +1,3 @@
-/// <reference path="../../types/momo.d.ts" />
-
 import {
 	API_V1,
 	APP_NAME,
@@ -8,7 +6,11 @@ import {
 	MOMO_PUBLIC_KEY,
 	MOMO_SECRET_KEY,
 } from '../../config/key';
-import { MOMO_PAYMENT_IPN, MOMO_PAYMENT_REDIRECT } from '../../config/route';
+import {
+	HOOK_MOMO,
+	MOMO_PAYMENT_IPN,
+	MOMO_PAYMENT_REDIRECT,
+} from '../../config/route';
 import { encrypted_Base64, encrypted_Hmac_SHA256 } from '../../helpers/encode';
 import {
 	httpsOptionsCheckStatusTrans,
@@ -20,6 +22,7 @@ import HttpError from '../../utils/HttpError';
 import { IClientDocument } from '../../models/client.model';
 import { IncomingMessage } from 'http';
 import Logger from '../../core/logger';
+import { MoMo } from '../../types/momo';
 import { Types } from 'mongoose';
 import contractService from '../contract/contract.service';
 import https from 'https';

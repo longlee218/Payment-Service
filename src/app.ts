@@ -42,11 +42,13 @@ const onListenning = () => {
 	Logger.info('express listening on ' + bind);
 };
 
-const domainSSLPath = path.join(__dirname, '../.cert');
-// const domainSSLPath = path.join(__dirname, '../.cert', 'fin.akb.vn_cloud');
+const domainSSLPath = path.join(__dirname, '../.cert', 'fin.akb.vn');
 const httpsOptions: ServerOptions = {
-	key: fs.readFileSync(domainSSLPath + '/key.pem'),
-	cert: fs.readFileSync(domainSSLPath + '/cert.pem'),
+	key: fs.readFileSync(domainSSLPath + '/fin.akb.vn-key.pem'),
+	cert: fs.readFileSync(domainSSLPath + '/fin.akb.vn-crt.pem'),
+	ca: fs.readFileSync(domainSSLPath + '/fin.akb.vn-chain.pem'),
+	// requestCert: false,
+	// rejectUnauthorized: false,
 };
 
 /**

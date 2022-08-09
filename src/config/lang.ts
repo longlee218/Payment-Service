@@ -20,3 +20,4 @@ export const MSG_REDIRECT = 'Đang điều hướng...';
 export const TITLE_ERROR = 'Đã có lỗi xảy ra';
 
 export const MSG_SALE_ARE_SOLVING = 'Đơn hàng đang chờ người dùng thanh toán.';
+export const MSG_SALE_ARE_DELETED = 'Đơn hàng đã bị hủy.';

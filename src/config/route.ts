@@ -8,4 +8,4 @@ export const MOMO_PAYMENT_REDIRECT = '/payment/momo/redirect';
 export const WHO_AM_I = '/who-am-i';
 
 export const HOOK_MOMO =
-	'https://webhook.site/67c013b5-fe32-494a-9465-fa53bf736c45';
+	'https://webhook.site/fee55631-258a-4915-83ff-4399d187c062';

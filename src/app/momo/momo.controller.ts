@@ -1,5 +1,3 @@
-/// <reference path="../../types/momo.d.ts" />
-
 import { Contract, Sale } from '../../models';
 import {
 	ERROR_APPLICATION,
@@ -10,14 +8,17 @@ import HttpResponse, { successCreator } from '../../utils/HttpResponse';
 import {
 	MSG_INVALID_SIGNATURE,
 	MSG_NOT_FOUND,
+	MSG_SALE_ARE_DELETED,
 	MSG_SALE_ARE_SOLVING,
 	MSG_SUCCESS,
 	MSG_TRADE_WAS_SLOVED,
 } from '../../config/lang';
 import { NextFunction, Request, Response } from 'express';
 
+import { EnumStatus } from '../../config/enum';
 import HttpError from '../../utils/HttpError';
 import Logger from '../../core/logger';
+import { MoMo } from '../../types/momo';
 import contractService from '../contract/contract.service';
 import momoDto from './momo.dto';
 import momoService from './momo.service';
@@ -27,67 +28,69 @@ import url from 'url';
 
 export class MomoPayment {
 	async requirePayment(req: Request, res: Response, next: NextFunction) {
-		const {
-			storeId,
-			tax,
-			price,
-			orderId,
-			orderInfo,
-			extraData,
-			userInfo,
-			ipnUrl,
-			redirectUrl,
-			signature1st,
-		} = await momoDto.requirePayment(req);
+		console.log(req.body);
+		return res.json('kaka');
+		// const {
+		// 	storeId,
+		// 	tax,
+		// 	price,
+		// 	orderId,
+		// 	orderInfo,
+		// 	extraData,
+		// 	userInfo,
+		// 	ipnUrl,
+		// 	redirectUrl,
+		// 	signature1st,
+		// } = await momoDto.requirePayment(req);
 
-		const saleHas = await Sale.findOne({
-			orderId,
-			client: req.clientAKB._id,
-		});
+		// const saleHas = await Sale.findOne({
+		// 	orderId,
+		// 	client: req.clientAKB._id,
+		// });
 
-		if (saleHas) {
-			throw new HttpError({
-				message: saleHas.isSuccess
-					? MSG_TRADE_WAS_SLOVED
-					: MSG_SALE_ARE_SOLVING,
-				errorCode: ERROR_APPLICATION,
-			});
-		}
+		// if (saleHas) {
+		// 	throw new HttpError({
+		// 		message: saleHas.isSuccess
+		// 			? MSG_TRADE_WAS_SLOVED
+		// 			: MSG_SALE_ARE_SOLVING,
+		// 		errorCode: ERROR_APPLICATION,
+		// 	});
+		// }
 
-		const sale = await saleService.initNewSale(req.clientAKB, {
-			orderId,
-			storeId,
-			tax,
-			price,
-			saleInfo: orderInfo,
-			extraData: extraData || '',
-			userInfo,
-		});
+		// const sale = await saleService.initNewSale(req.clientAKB, {
+		// 	orderId,
+		// 	storeId,
+		// 	tax,
+		// 	price,
+		// 	saleInfo: orderInfo,
+		// 	extraData: extraData || '',
+		// 	userInfo,
+		// });
 
-		return momoService.getPaymentTypeFromMomo(
-			req.clientAKB,
-			sale._id,
-			req.fullHost,
-			{
-				storeId: storeId,
-				amount: price,
-				orderId: sale._id.toString(),
-				orderInfo: orderInfo,
-				extraData: extraData,
-				ipnUrlClient: ipnUrl || req.clientAKB.ipnUrl,
-				redirectUrlClient: redirectUrl || req.clientAKB.redirectUrl,
-				signature1st: signature1st,
-			},
-			(error: any | null, data: any) => {
-				if (error) {
-					return next(error);
-				}
-				return new HttpResponse({
-					res,
-					data: data,
-				});
-			}
-		);
+		// return momoService.getPaymentTypeFromMomo(
+		// 	req.clientAKB,
+		// 	sale._id,
+		// 	req.fullHost,
+		// 	{
+		// 		storeId: storeId,
+		// 		amount: price,
+		// 		orderId: sale._id.toString(),
+		// 		orderInfo: orderInfo,
+		// 		extraData: extraData,
+		// 		ipnUrlClient: ipnUrl || req.clientAKB.ipnUrl,
+		// 		redirectUrlClient: redirectUrl || req.clientAKB.redirectUrl,
+		// 		signature1st: signature1st,
+		// 	},
+		// 	(error: any | null, data: any) => {
+		// 		if (error) {
+		// 			return next(error);
+		// 		}
+		// 		return new HttpResponse({
+		// 			res,
+		// 			data: data,
+		// 		});
+		// 	}
+		// );
 	}
 
 	async ipnSolveMomo(req: Request, res: Response, next: NextFunction) {
@@ -115,7 +118,7 @@ export class MomoPayment {
 			orderType,
 			transId,
 		} = body;
-		const contract = await Contract.findOne({ requestId });
+		const contract = await Contract.findOneWithDeleted({ requestId });
 
 		// Error from MOMO
 		if (!contract) {
@@ -126,6 +129,16 @@ export class MomoPayment {
 			Logger.error(error.message, error);
 			return res.sendStatus(204);
 		}
+
+		if (contract.deleted) {
+			const error = new HttpError({
+				message: MSG_SALE_ARE_DELETED + ' requestId: ' + requestId,
+				errorCode: ERROR_MOMO,
+			});
+			Logger.error(error.message, error);
+			return res.sendStatus(204);
+		}
+
 		const ipnClient = contract.ipnUrl;
 		const sale = await Sale.findOne({ _id: contract.sale });
 
@@ -177,8 +190,7 @@ export class MomoPayment {
 			const body: MoMo.IParamsMomoReturnToApp = {
 				orderId: sale.orderId,
 				price: amount,
-				solved: 1,
-				resolved: 1,
+				statusCode: EnumStatus.SOLVE_SUCCESS,
 				signature1st: contract.signature1st,
 				signature2nd: contract.signature2nd,
 				timeResponse: new Date().getTime(),
@@ -186,6 +198,8 @@ export class MomoPayment {
 				saleId: sale.id,
 				message: message,
 			};
+			Logger.info('Send data to ' + ipnClient);
+			console.log(body);
 			await postData(ipnClient, successCreator(200, MSG_SUCCESS, body));
 		} else {
 			const error = new HttpError({
@@ -216,8 +230,10 @@ export class MomoPayment {
 			extraData,
 			signature,
 		} = query;
-		const contract = await Contract.findOne({ requestId });
-		// Error from Momo or client
+
+		const contract = await Contract.findOneWithDeleted({ requestId });
+
+		// Error from Momo or client or Order
 		if (!contract) {
 			const error = new HttpError({
 				message: MSG_NOT_FOUND + ' requestId: ' + requestId,
@@ -228,20 +244,20 @@ export class MomoPayment {
 
 		const redirectUrl = contract.redirectUrl;
 		let redirectLink: string = '';
-		const sale = await Sale.findOne({ _id: contract.sale });
+		const sale = await Sale.findOneWithDeleted({ _id: contract.sale });
 
 		const params: MoMo.IParamsMomoReturnToApp = {
 			orderId: sale.orderId,
 			price: amount,
-			solved: 0, // ko xu ly
-			resolved: 0, // ko xu ly
-			signature1st: contract.signature1st,
-			signature2nd: contract.signature2nd,
+			statusCode: EnumStatus.REJECT,
+			signature1st: '',
+			signature2nd: '',
 			timeResponse: new Date().getTime(),
 			typePaid: payType || '',
 			saleId: sale.id,
 			message: message,
 		};
+
 		if (!sale) {
 			params.message = MSG_NOT_FOUND;
 			redirectLink = url.format({
@@ -250,9 +266,18 @@ export class MomoPayment {
 			});
 			return res.redirect(redirectLink);
 		}
+
+		if (sale.deleted) {
+			redirectLink = url.format({
+				pathname: redirectUrl,
+				query: params as any,
+			});
+			return res.redirect(redirectLink);
+		}
+
 		if (sale.isSuccess) {
 			Logger.info(MSG_TRADE_WAS_SLOVED, { sale });
-			params.resolved = 1;
+			params.statusCode = EnumStatus.WAS_SOLVE_SUCCESS;
 			params.message = MSG_TRADE_WAS_SLOVED;
 			redirectLink = url.format({
 				pathname: redirectUrl,
@@ -260,6 +285,7 @@ export class MomoPayment {
 			});
 			return res.redirect(redirectLink);
 		}
+
 		const isValidSignature = momoService.checkValidSignatureFromMomo(
 			signature,
 			sale.price,
@@ -295,8 +321,9 @@ export class MomoPayment {
 			responseTime
 		);
 		if (solvedContract) {
-			params.solved = 1;
-			params.resolved = 1;
+			params.signature1st = contract.signature1st;
+			params.signature2nd = contract.signature2nd;
+			params.statusCode = EnumStatus.SOLVE_SUCCESS;
 			params.message = message;
 		}
 		redirectLink = url.format({
