@@ -1,7 +1,7 @@
 {
 	"name": "payment_service-server",
 	"version": "1.0.0",
-	"description": "This is app from LongLe",
+	"description": "This service was build by LongLe",
 	"main": "src/app.js",
 	"scripts": {
 		"start": "tsc && node build/app.js",

@@ -4,9 +4,10 @@ import { NextFunction, Request, Response } from 'express';
 import { Client } from '../../models';
 import HttpError from '../../utils/HttpError';
 import HttpResponse from '../../utils/HttpResponse';
+import IBaseController from '../base/base.controller';
 import clientDto from './client.dto';
 
-export class ClientController {
+export default class ClientController implements IBaseController {
 	async whoAmI(
 		req: Request,
 		res: Response,
@@ -82,5 +83,3 @@ export class ClientController {
 		return new HttpResponse({ res, statusCode: 204, msg: MSG_SUCCESS });
 	}
 }
-
-export default new ClientController();

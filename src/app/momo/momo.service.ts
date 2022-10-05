@@ -6,11 +6,7 @@ import {
 	MOMO_PUBLIC_KEY,
 	MOMO_SECRET_KEY,
 } from '../../config/key';
-import {
-	HOOK_MOMO,
-	MOMO_PAYMENT_IPN,
-	MOMO_PAYMENT_REDIRECT,
-} from '../../config/route';
+import { MOMO_PAYMENT_IPN, MOMO_PAYMENT_REDIRECT } from '../../config/route';
 import { encrypted_Base64, encrypted_Hmac_SHA256 } from '../../helpers/encode';
 import {
 	httpsOptionsCheckStatusTrans,

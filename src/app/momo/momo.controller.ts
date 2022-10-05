@@ -9,7 +9,6 @@ import {
 	MSG_INVALID_SIGNATURE,
 	MSG_NOT_FOUND,
 	MSG_SALE_ARE_DELETED,
-	MSG_SALE_ARE_SOLVING,
 	MSG_SUCCESS,
 	MSG_TRADE_WAS_SLOVED,
 } from '../../config/lang';
@@ -17,6 +16,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import { EnumStatus } from '../../config/enum';
 import HttpError from '../../utils/HttpError';
+import IBaseController from '../base/base.controller';
 import Logger from '../../core/logger';
 import { MoMo } from '../../types/momo';
 import contractService from '../contract/contract.service';
@@ -26,71 +26,76 @@ import { postData } from '../../services/requestToServer';
 import saleService from '../sale/sale.service';
 import url from 'url';
 
-export class MomoPayment {
+export default class MomoPaymentController implements IBaseController {
 	async requirePayment(req: Request, res: Response, next: NextFunction) {
 		console.log(req.body);
-		return res.json('kaka');
-		// const {
-		// 	storeId,
-		// 	tax,
-		// 	price,
-		// 	orderId,
-		// 	orderInfo,
-		// 	extraData,
-		// 	userInfo,
-		// 	ipnUrl,
-		// 	redirectUrl,
-		// 	signature1st,
-		// } = await momoDto.requirePayment(req);
+		const {
+			storeId,
+			tax,
+			price,
+			orderId,
+			orderInfo,
+			extraData,
+			userInfo,
+			ipnUrl,
+			redirectUrl,
+			signature1st,
+		} = await momoDto.requirePayment(req);
 
-		// const saleHas = await Sale.findOne({
-		// 	orderId,
-		// 	client: req.clientAKB._id,
-		// });
+		const saleHas = await Sale.findOne({
+			orderId,
+			client: req.clientAKB._id,
+		});
 
-		// if (saleHas) {
-		// 	throw new HttpError({
-		// 		message: saleHas.isSuccess
-		// 			? MSG_TRADE_WAS_SLOVED
-		// 			: MSG_SALE_ARE_SOLVING,
-		// 		errorCode: ERROR_APPLICATION,
-		// 	});
-		// }
+		if (saleHas) {
+			// throw new HttpError({
+			// 	message: saleHas.isSuccess
+			// 		? MSG_TRADE_WAS_SLOVED
+			// 		: MSG_SALE_ARE_SOLVING,
+			// 	errorCode: ERROR_APPLICATION,
+			// });
+			if (saleHas.isSuccess) {
+				throw new HttpError({
+					message: MSG_TRADE_WAS_SLOVED,
+					errorCode: ERROR_APPLICATION,
+				});
+			}
+		}
 
-		// const sale = await saleService.initNewSale(req.clientAKB, {
-		// 	orderId,
-		// 	storeId,
-		// 	tax,
-		// 	price,
-		// 	saleInfo: orderInfo,
-		// 	extraData: extraData || '',
-		// 	userInfo,
-		// });
+		const sale = await saleService.initNewSale(req.clientAKB, {
+			orderId,
+			storeId,
+			tax,
+			price,
+			saleInfo: orderInfo,
+			extraData: extraData || '',
+			userInfo,
+		});
 
-		// return momoService.getPaymentTypeFromMomo(
-		// 	req.clientAKB,
-		// 	sale._id,
-		// 	req.fullHost,
-		// 	{
-		// 		storeId: storeId,
-		// 		amount: price,
-		// 		orderId: sale._id.toString(),
-		// 		orderInfo: orderInfo,
-		// 		extraData: extraData,
-		// 		ipnUrlClient: ipnUrl || req.clientAKB.ipnUrl,
-		// 		redirectUrlClient: redirectUrl || req.clientAKB.redirectUrl,
-		// 		signature1st: signature1st,
-		// 	},
-		// 	(error: any | null, data: any) => {
-		// 		if (error) {
-		// 			return next(error);
-		// 		}
-		// 		return new HttpResponse({
-		// 			res,
-		// 			data: data,
-		// 		});
-		// 	}
-		// );
+		return momoService.getPaymentTypeFromMomo(
+			req.clientAKB,
+			sale._id,
+			req.fullHost,
+			{
+				storeId: storeId,
+				amount: price,
+				orderId: sale._id.toString(),
+				orderInfo: orderInfo,
+				extraData: extraData,
+				ipnUrlClient: ipnUrl || req.clientAKB.ipnUrl,
+				redirectUrlClient: redirectUrl || req.clientAKB.redirectUrl,
+				signature1st: signature1st,
+			},
+			(error: any | null, data: any) => {
+				if (error) {
+					return next(error);
+				}
+				return new HttpResponse({
+					res,
+					data: data,
+				});
+			}
+		);
 	}
 
 	async ipnSolveMomo(req: Request, res: Response, next: NextFunction) {
@@ -200,7 +205,10 @@ export class MomoPayment {
 			};
 			Logger.info('Send data to ' + ipnClient);
 			console.log(body);
-			await postData(ipnClient, successCreator(200, MSG_SUCCESS, body));
+			await postData(
+				ipnClient,
+				successCreator(200, MSG_SUCCESS, body)
+			).catch((error) => Logger.error(error.message));
 		} else {
 			const error = new HttpError({
 				status: 400,
@@ -334,5 +342,3 @@ export class MomoPayment {
 		return res.redirect(redirectLink);
 	}
 }
-
-export default new MomoPayment();
